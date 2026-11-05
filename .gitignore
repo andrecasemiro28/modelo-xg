@@ -1,0 +1,8 @@
+# dados brutos não são salvos (extract.py lê direto do GitHub)
+data/raw/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+venv/
+.DS_Store
