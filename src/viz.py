@@ -115,15 +115,15 @@ def finishing(players: pd.DataFrame, save=None):
     ax.set_facecolor(BG)
     ax.barh(d["nome"], d["diff"], color=colors, height=0.65)
     ax.axvline(0, color=SUB, lw=1)
-    for i, (v, c, g, x) in enumerate(zip(d["diff"], d["chutes"], d["gols"], d["xg"])):
-        ax.text(v + (1.5 if v > 0 else -1.5), i, f"{int(g)} gols · {x:.0f} xG",
+    for i, (v, g, x, z) in enumerate(zip(d["diff"], d["gols"], d["xg"], d["z"])):
+        ax.text(v + (1.5 if v > 0 else -1.5), i, f"{int(g)} gols · {x:.0f} xG · z = {z:+.1f}",
                 va="center", ha="left" if v > 0 else "right", size=8.5, color=SUB)
     ax.set_xlabel("Gols − xG (sem pênaltis)", color=TEXT)
     ax.tick_params(axis="y", length=0)
-    lim = d["diff"].abs().max() * 1.45
+    lim = d["diff"].abs().max() * 1.6
     ax.set_xlim(-lim * 0.45, lim)
     _style(ax, "Finalizadores acima e abaixo do esperado",
-           "Jogadores com 150+ chutes no StatsBomb Open Data · xG fora da amostra (validação cruzada)")
+           "Jogadores com 150+ chutes · xG fora da amostra · z = desvios-padrão acima do esperado (|z| > 2 dificilmente é sorte)")
     fig.tight_layout()
     if save:
         fig.savefig(save, dpi=160, bbox_inches="tight", facecolor=BG)

@@ -151,3 +151,21 @@ def mask_sparse(grid: pd.DataFrame, df: pd.DataFrame, min_shots: int = 15, radiu
               for x, y in zip(g["x"], g["y"])]
     g.loc[np.array(counts) < min_shots, "xg"] = np.nan
     return g
+
+
+def finishing_table(df: pd.DataFrame, xg_col: str = "xg", min_shots: int = 50) -> pd.DataFrame:
+    """Gols vs. xG por jogador, com teste de significância.
+
+    Cada chute é tratado como uma moeda que vira gol com probabilidade p (o xG).
+    Se a finalização fosse "média", o total de gols teria média sum(p) e
+    variância sum(p * (1 - p)) (distribuição Poisson-binomial).
+    z = (gols - xG) / desvio padrão indica quantos desvios o jogador está acima
+    (ou abaixo) do esperado só por acaso: |z| > 2 dificilmente é sorte.
+    """
+    g = (df.assign(_var=df[xg_col] * (1 - df[xg_col]))
+           .groupby("player")
+           .agg(chutes=("goal", "size"), gols=("goal", "sum"), xg=(xg_col, "sum"), var=("_var", "sum")))
+    g["diff"] = g["gols"] - g["xg"]
+    g["desvio_padrao"] = np.sqrt(g["var"])
+    g["z"] = g["diff"] / g["desvio_padrao"]
+    return g[g["chutes"] >= min_shots].drop(columns="var")

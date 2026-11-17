@@ -57,6 +57,18 @@ Com as previsões fora da amostra, comparo gols com xG acumulado. **Messi** marc
 
 ![Finalizadores](reports/figures/finalizadores.png)
 
+### Habilidade ou sorte?
+
+Para separar habilidade de variância, cada chute é tratado como uma moeda que vira gol com probabilidade *p* (o xG). Se o jogador finalizasse como a média, marcaria **Σp** gols com variância **Σp(1−p)** (distribuição Poisson-binomial). O **z = (gols − xG) / desvio padrão** mostra quantos desvios ele está acima do esperado.
+
+| Jogador | Chutes | Gols − xG | Desvio padrão | z |
+|---|---:|---:|---:|---:|
+| Messi | 2.583 | +89,5 | 15,7 | **+5,7** |
+| Mbappé | 294 | +12,7 | 5,3 | +2,4 |
+| Suárez | 628 | +16,8 | 8,6 | +2,0 |
+
+O desempenho do Messi está **5,7 desvios acima do esperado**, o que está muito longe de ser sorte. Suárez e Mbappé ficam perto do limite de 2 desvios. *Análise sugerida por Diego Arruda nos comentários do post do projeto.*
+
 ## Como rodar
 
 ```bash

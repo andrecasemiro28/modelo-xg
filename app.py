@@ -157,14 +157,26 @@ with tab_perf:
 with tab_fin:
     st.markdown("Gols sem pênalti **menos** xG previsto fora da amostra. Valores positivos indicam um jogador "
                 "que finaliza **acima do esperado**.")
+    with st.expander("Habilidade ou sorte? Como ler a coluna z"):
+        st.markdown(
+            "Cada chute é tratado como uma moeda que vira gol com probabilidade *p* (o xG). Se o jogador finalizasse "
+            "como a média, marcaria em média **Σp** gols, com variância **Σp(1−p)**. "
+            "O **z = (gols − xG) / desvio padrão** mostra quantos desvios ele está acima do esperado: "
+            "com **|z| > 2**, a diferença dificilmente é sorte.")
     fin = pd.read_csv(ROOT / "data" / "processed" / "finalizadores.csv")
     fin["player"] = fin["player"].map(short_name)
     minimo = st.slider("Mínimo de chutes", 50, 500, 150, 25)
     f = fin[fin["chutes"] >= minimo].sort_values("diff", ascending=False)
-    f["gols/xG"] = (f["gols"] / f["xg"]).round(2)
+    so_sig = st.checkbox("Mostrar só diferenças significativas (|z| > 2)")
+    if so_sig:
+        f = f[f["z"].abs() > 2]
+    f = f[["player", "chutes", "gols", "xg", "diff", "desvio_padrao", "z"]]
     st.dataframe(
-        f.rename(columns={"player": "Jogador", "chutes": "Chutes", "gols": "Gols", "xg": "xG", "diff": "Gols − xG"}),
+        f.rename(columns={"player": "Jogador", "chutes": "Chutes", "gols": "Gols", "xg": "xG", "diff": "Gols − xG",
+                          "desvio_padrao": "Desvio padrão", "z": "z (desvios)"}),
         hide_index=True, width="stretch",
         column_config={"Gols − xG": st.column_config.NumberColumn(format="%+.1f"),
-                       "xG": st.column_config.NumberColumn(format="%.1f")})
+                       "xG": st.column_config.NumberColumn(format="%.1f"),
+                       "Desvio padrão": st.column_config.NumberColumn(format="%.1f"),
+                       "z (desvios)": st.column_config.NumberColumn(format="%+.1f")})
     st.caption("Somente futebol masculino. O Open Data tem muitos jogos do Barcelona, o que favorece jogadores daquele elenco.")
